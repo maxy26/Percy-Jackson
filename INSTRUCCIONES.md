@@ -15,7 +15,7 @@
 
 ## Crear o cambiar animaciones del héroe
 
-Requisitos: el Aseprite compilado (`C:\Users\Usuario\Documents\aseprite\build\bin\aseprite.exe`) y Python 3. Las rutas son relativas a la carpeta del proyecto.
+Requisitos: el Aseprite compilado (`C:\Herramientas\Aseprite\aseprite.exe`) y Python 3. Las rutas son relativas a la carpeta del proyecto.
 
 1. **Generar propuestas** (sprites del personaje y del tridente a partir de `Arte/Heroe/heroe_base_con_tridente.png`):
    ```

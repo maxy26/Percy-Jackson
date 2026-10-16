@@ -51,4 +51,4 @@ Percy Jackson/
 
 ## Entorno
 
-Windows 11, Unity 6000.4.8f1, Aseprite compilado desde el código fuente (`C:\Users\Usuario\Documents\aseprite\build\bin\aseprite.exe`) y Python 3.14. Equipo con 8 GB de RAM y gráfica integrada.
+Windows 11, Unity 6000.4.8f1, Aseprite compilado desde el código fuente, instalado en (`C:\Herramientas\Aseprite\aseprite.exe`) y Python 3.14. Equipo con 8 GB de RAM y gráfica integrada.

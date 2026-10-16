@@ -24,3 +24,4 @@
 | Fecha | Hecho |
 |---|---|
 | 2026-10-15 | Proyecto creado; arte del héroe trasladado; reposo y brillo del tridente en Unity |
+| 2026-10-15 | Aseprite compilado movido a `C:\Herramientas\Aseprite`; rutas actualizadas |
