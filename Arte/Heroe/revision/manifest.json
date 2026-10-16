@@ -1,0 +1,9 @@
+{ "tam": 70, "ancho": 45, "alto": 70, "animaciones": [
+{ "nombre": "Personaje sin tridente", "descripcion": "Reposo: cabeza y torso bajan juntos al respirar. La pierna y la bota izquierdas se reconstruyeron.", "variantes": [
+{ "id": "reposo", "nombre": "Reposo", "nota": "Mismo reposo que aprobaste (B), ahora sin el tridente.", "fotogramas": ["sprites/reposo/01.png","sprites/reposo/02.png","sprites/reposo/03.png","sprites/reposo/04.png"], "duraciones": [360,280,360,280] }
+] }
+,{ "nombre": "Tridente", "descripcion": "Sprite aparte, en la misma posición que en la mano (45x70): ponlo encima del personaje.", "variantes": [
+{ "id": "tridente_brillo", "nombre": "Tridente · brillo", "nota": "Quieto y, cada 2 s, un brillo recorre las puntas (el mismo destello del reposo aprobado).", "fotogramas": ["sprites/tridente_brillo/01.png","sprites/tridente_brillo/02.png","sprites/tridente_brillo/03.png","sprites/tridente_brillo/04.png","sprites/tridente_brillo/05.png","sprites/tridente_brillo/06.png"], "duraciones": [1000,110,110,110,140,560] }
+,{ "id": "combinado", "nombre": "Vista previa: personaje + tridente", "nota": "Las dos capas juntas, para comprobar que encajan como el original.", "fotogramas": ["sprites/combinado/01.png","sprites/combinado/02.png","sprites/combinado/03.png","sprites/combinado/04.png","sprites/combinado/05.png","sprites/combinado/06.png","sprites/combinado/07.png","sprites/combinado/08.png","sprites/combinado/09.png"], "duraciones": [360,280,360,280,110,110,110,140,280] }
+] }
+] }

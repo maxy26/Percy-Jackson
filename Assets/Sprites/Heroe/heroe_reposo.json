@@ -1,0 +1,50 @@
+{ "frames": [
+   {
+    "filename": "heroe #reposo 0.aseprite",
+    "frame": { "x": 0, "y": 0, "w": 45, "h": 70 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 70 },
+    "sourceSize": { "w": 45, "h": 70 },
+    "duration": 360
+   },
+   {
+    "filename": "heroe #reposo 1.aseprite",
+    "frame": { "x": 45, "y": 0, "w": 45, "h": 70 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 70 },
+    "sourceSize": { "w": 45, "h": 70 },
+    "duration": 280
+   },
+   {
+    "filename": "heroe #reposo 2.aseprite",
+    "frame": { "x": 90, "y": 0, "w": 45, "h": 70 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 70 },
+    "sourceSize": { "w": 45, "h": 70 },
+    "duration": 360
+   },
+   {
+    "filename": "heroe #reposo 3.aseprite",
+    "frame": { "x": 135, "y": 0, "w": 45, "h": 70 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 70 },
+    "sourceSize": { "w": 45, "h": 70 },
+    "duration": 280
+   }
+ ],
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.18.6-6-gb3e34acba-dev",
+  "image": "heroe_reposo.png",
+  "format": "RGBA8888",
+  "size": { "w": 180, "h": 70 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "reposo", "from": 0, "to": 3, "direction": "forward", "color": "#000000ff" }
+  ]
+ }
+}

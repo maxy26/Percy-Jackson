@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisión del Héroe</title>
+<style>
+  :root {
+    --bg: #15171c;
+    --panel: #1e2129;
+    --panel2: #262a34;
+    --borde: #333846;
+    --texto: #e6e8ee;
+    --suave: #9aa0ad;
+    --acento: #a9c4e8;
+    --ok: #7fc99a;
+    --mal: #e48a8a;
+    --medio: #e3c27a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--texto);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  header { padding: 28px 24px 8px; max-width: 1200px; margin: 0 auto; }
+  h1 { margin: 0 0 4px; font-size: 24px; font-weight: 650; }
+  header p { margin: 0; color: var(--suave); max-width: 760px; }
+  .controles {
+    max-width: 1200px; margin: 16px auto 0; padding: 0 24px;
+    display: flex; flex-wrap: wrap; gap: 18px; align-items: center; color: var(--suave); font-size: 14px;
+  }
+  .grupo { display: flex; gap: 6px; align-items: center; }
+  .chip {
+    border: 1px solid var(--borde); background: var(--panel); color: var(--texto);
+    padding: 5px 11px; border-radius: 999px; cursor: pointer; font: inherit; font-size: 13px;
+  }
+  .chip[aria-pressed="true"] { background: var(--acento); color: #11151c; border-color: var(--acento); }
+  main { max-width: 1200px; margin: 0 auto; padding: 8px 24px 60px; }
+  section h2 { font-size: 19px; margin: 32px 0 2px; }
+  section > p { margin: 0 0 14px; color: var(--suave); }
+  .tarjetas { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 16px; }
+  .tarjeta {
+    background: var(--panel); border: 1px solid var(--borde); border-radius: 12px;
+    padding: 14px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .tarjeta.favorita { border-color: var(--acento); box-shadow: 0 0 0 1px var(--acento); }
+  .tarjeta h3 { margin: 0; font-size: 16px; }
+  .nota { margin: 0; color: var(--suave); font-size: 13.5px; min-height: 40px; }
+  .escenario { display: flex; justify-content: center; border-radius: 8px; overflow: hidden; }
+  canvas { display: block; max-width: 100%; }
+  .pixelado canvas { image-rendering: pixelated; }
+  .reproductor { display: flex; gap: 6px; align-items: center; font-size: 13px; color: var(--suave); }
+  .reproductor button {
+    border: 1px solid var(--borde); background: var(--panel2); color: var(--texto);
+    border-radius: 6px; padding: 3px 9px; cursor: pointer; font: inherit;
+  }
+  .reproductor .info { margin-left: auto; font-variant-numeric: tabular-nums; }
+  .tira { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px; }
+  .tira canvas { border: 1px solid var(--borde); border-radius: 4px; cursor: pointer; flex: none; }
+  .tira canvas.actual { border-color: var(--acento); }
+  .votos { display: flex; gap: 6px; flex-wrap: wrap; }
+  .voto {
+    flex: 1; border: 1px solid var(--borde); background: var(--panel2); color: var(--texto);
+    border-radius: 8px; padding: 7px 8px; cursor: pointer; font: inherit; font-size: 13.5px;
+  }
+  .voto[data-v="me_gusta"][aria-pressed="true"] { background: var(--ok); color: #10241a; border-color: var(--ok); }
+  .voto[data-v="mas_o_menos"][aria-pressed="true"] { background: var(--medio); color: #2a2109; border-color: var(--medio); }
+  .voto[data-v="no_me_gusta"][aria-pressed="true"] { background: var(--mal); color: #2b1111; border-color: var(--mal); }
+  label.fav { display: flex; gap: 8px; align-items: center; font-size: 13.5px; cursor: pointer; }
+  textarea {
+    width: 100%; min-height: 64px; resize: vertical; background: var(--panel2); color: var(--texto);
+    border: 1px solid var(--borde); border-radius: 8px; padding: 8px; font: inherit; font-size: 14px;
+  }
+  textarea:focus, button:focus-visible { outline: 2px solid var(--acento); outline-offset: 1px; }
+  .guardar { display: flex; gap: 10px; align-items: center; }
+  .guardar button {
+    background: var(--acento); color: #11151c; border: 0; border-radius: 8px;
+    padding: 8px 14px; font: inherit; font-weight: 600; cursor: pointer;
+  }
+  .estado { font-size: 13px; color: var(--suave); }
+  .estado.ok { color: var(--ok); }
+  .estado.error { color: var(--mal); }
+  footer { max-width: 1200px; margin: 0 auto; padding: 0 24px 40px; color: var(--suave); font-size: 14px; }
+  @media (max-width: 520px) {
+    header, .controles, main, footer { padding-left: 16px; padding-right: 16px; }
+    .tarjetas { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Revisión del héroe del tridente</h1>
+  <p>Cada animación tiene varias propuestas. Míralas, vota cada una, marca tu favorita y escribe qué le cambiarías. Pulsa <b>Guardar</b> en cada tarjeta. Cuando termines, avísame en el chat y leo tus respuestas.</p>
+</header>
+
+<div class="controles">
+  <div class="grupo" role="group" aria-label="Fondo">Fondo:
+    <button class="chip" data-fondo="hollow" aria-pressed="true">Hollow</button>
+    <button class="chip" data-fondo="oscuro" aria-pressed="false">Oscuro</button>
+    <button class="chip" data-fondo="claro" aria-pressed="false">Claro</button>
+    <button class="chip" data-fondo="cuadros" aria-pressed="false">Cuadros</button>
+    <button class="chip" data-fondo="verde" aria-pressed="false">Verde</button>
+  </div>
+  <div class="grupo" role="group" aria-label="Zoom" id="zooms">Zoom:</div>
+  <div class="grupo" role="group" aria-label="Velocidad">Velocidad:
+    <button class="chip" data-vel="0.5" aria-pressed="false">½</button>
+    <button class="chip" data-vel="1" aria-pressed="true">Normal</button>
+    <button class="chip" data-vel="2" aria-pressed="false">×2</button>
+  </div>
+</div>
+
+<main id="contenido"><p class="estado">Cargando propuestas…</p></main>
+<footer>Los sprites se muestran con su transparencia real. Pixel art a tamaño original: 45×70 px por fotograma.</footer>
+
+<script>
+const FONDOS = {
+  hollow: "#1a2030",
+  oscuro: "#2c303a",
+  claro: "#d9dde3",
+  verde: "#96a096",
+};
+const ajustes = { fondo: "hollow", zoom: 1, vel: 1 };
+let suave = false;
+let fuente = 1;   // escala a la que están renderizadas las imágenes
+let anchoRef = 0; // si existe, todas las variantes se muestran con este ancho base
+const reproductores = [];
+let opiniones = {};
+
+function patronCuadros(ctx, t) {
+  const c = document.createElement("canvas");
+  c.width = c.height = t * 2;
+  const g = c.getContext("2d");
+  g.fillStyle = "#8a8f99"; g.fillRect(0, 0, t * 2, t * 2);
+  g.fillStyle = "#b4b8c0"; g.fillRect(0, 0, t, t); g.fillRect(t, t, t, t);
+  return ctx.createPattern(c, "repeat");
+}
+
+function pintarFondo(ctx, w, h, escala) {
+  ctx.fillStyle = ajustes.fondo === "cuadros"
+    ? patronCuadros(ctx, Math.max(4, escala * 2))
+    : FONDOS[ajustes.fondo];
+  ctx.fillRect(0, 0, w, h);
+}
+
+function cargarImagen(src) {
+  return new Promise((ok, mal) => {
+    const img = new Image();
+    img.onload = () => ok(img);
+    img.onerror = () => mal(new Error("No se pudo cargar " + src));
+    img.src = src;
+  });
+}
+
+function cortarHoja(hoja, v, lado) {
+  return Array.from({ length: v.n }, (_, i) => {
+    const c = document.createElement("canvas");
+    const fw = v.fw || lado, fh = v.fh || lado;
+    c.width = fw; c.height = fh;
+    c.getContext("2d").drawImage(hoja, (i % v.cols) * fw, Math.floor(i / v.cols) * fh, fw, fh, 0, 0, fw, fh);
+    return c;
+  });
+}
+
+function crearReproductor(variante, imagenes, tam, tarjeta) {
+  const lienzo = tarjeta.querySelector(".escenario canvas");
+  const ctx = lienzo.getContext("2d");
+  const tira = tarjeta.querySelector(".tira");
+  const info = tarjeta.querySelector(".info");
+  const botonPlay = tarjeta.querySelector("[data-accion=play]");
+  const total = variante.duraciones.reduce((a, b) => a + b, 0);
+  // Tamaño real del fotograma (puede no ser cuadrado)
+  const sv = variante.suave ?? suave;
+  const fv = variante.escalaFuente ?? fuente;
+  const iw = (imagenes[0].naturalWidth || imagenes[0].width) / fv;
+  const ih = (imagenes[0].naturalHeight || imagenes[0].height) / fv;
+  const ref = anchoRef ? anchoRef / iw : 1;
+  const escMini = anchoRef ? 1.5 * ref : (sv ? 64 / Math.max(iw, ih) : 1.5);
+
+  const miniaturas = imagenes.map((img, i) => {
+    const m = document.createElement("canvas");
+    m.width = Math.round(iw * escMini);
+    m.height = Math.round(ih * escMini);
+    m.title = `Fotograma ${i + 1} · ${variante.duraciones[i]} ms`;
+    m.addEventListener("click", () => { r.reproduciendo = false; r.ir(i); });
+    tira.appendChild(m);
+    return m;
+  });
+
+  const r = {
+    i: 0, acumulado: 0, reproduciendo: true,
+    dibujar() {
+      const z = ajustes.zoom * ref;
+      if (lienzo.width !== Math.round(iw * z)) { lienzo.width = Math.round(iw * z); lienzo.height = Math.round(ih * z); }
+      ctx.imageSmoothingEnabled = sv;
+      ctx.imageSmoothingQuality = "high";
+      pintarFondo(ctx, lienzo.width, lienzo.height, sv ? 6 : z);
+      ctx.drawImage(imagenes[this.i], 0, 0, lienzo.width, lienzo.height);
+      info.textContent = `${this.i + 1}/${imagenes.length} · ciclo ${(total / 1000).toFixed(2)} s`;
+      botonPlay.textContent = this.reproduciendo ? "Pausa" : "Reproducir";
+      miniaturas.forEach((m, k) => m.classList.toggle("actual", k === this.i));
+    },
+    dibujarMiniaturas() {
+      miniaturas.forEach((m, k) => {
+        const g = m.getContext("2d");
+        g.imageSmoothingEnabled = sv;
+        pintarFondo(g, m.width, m.height, sv ? 3 : 1.5);
+        g.drawImage(imagenes[k], 0, 0, m.width, m.height);
+      });
+    },
+    ir(k) { this.i = (k + imagenes.length) % imagenes.length; this.acumulado = 0; this.dibujar(); },
+    avanzar(dt) {
+      if (!this.reproduciendo) return;
+      this.acumulado += dt * ajustes.vel;
+      let cambio = false;
+      while (this.acumulado >= variante.duraciones[this.i]) {
+        this.acumulado -= variante.duraciones[this.i];
+        this.i = (this.i + 1) % imagenes.length;
+        cambio = true;
+      }
+      if (cambio) this.dibujar();
+    },
+  };
+
+  botonPlay.addEventListener("click", () => { r.reproduciendo = !r.reproduciendo; r.dibujar(); });
+  tarjeta.querySelector("[data-accion=ant]").addEventListener("click", () => { r.reproduciendo = false; r.ir(r.i - 1); });
+  tarjeta.querySelector("[data-accion=sig]").addEventListener("click", () => { r.reproduciendo = false; r.ir(r.i + 1); });
+  r.dibujarMiniaturas();
+  r.dibujar();
+  return r;
+}
+
+function crearTarjeta(variante, animacion, multiple) {
+  const t = document.createElement("article");
+  t.className = "tarjeta";
+  t.dataset.id = variante.id;
+  t.dataset.animacion = animacion;
+  t.innerHTML = `
+    <h3></h3>
+    <p class="nota"></p>
+    <div class="escenario"><canvas></canvas></div>
+    <div class="reproductor">
+      <button data-accion="ant" aria-label="Fotograma anterior">◀</button>
+      <button data-accion="play">Pausa</button>
+      <button data-accion="sig" aria-label="Fotograma siguiente">▶</button>
+      <span class="info"></span>
+    </div>
+    <div class="tira" aria-label="Fotogramas"></div>
+    <div class="votos" role="group" aria-label="¿Te gusta?">
+      <button class="voto" data-v="me_gusta" aria-pressed="false">👍 Me gusta</button>
+      <button class="voto" data-v="mas_o_menos" aria-pressed="false">🤔 Más o menos</button>
+      <button class="voto" data-v="no_me_gusta" aria-pressed="false">👎 No me gusta</button>
+    </div>
+    <label class="fav"><input type="checkbox"> Es mi favorita de esta animación</label>
+    <textarea placeholder="¿Qué le cambiarías? (opcional)"></textarea>
+    <div class="guardar"><button>Guardar</button><span class="estado"></span></div>`;
+  t.querySelector("h3").textContent = variante.nombre;
+  t.querySelector(".nota").textContent = variante.nota;
+
+  const previa = opiniones[variante.id] || {};
+  let voto = previa.voto || "";
+  const botones = t.querySelectorAll(".voto");
+  const marcar = () => botones.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === voto)));
+  botones.forEach(b => b.addEventListener("click", () => { voto = voto === b.dataset.v ? "" : b.dataset.v; marcar(); }));
+  marcar();
+
+  if (multiple) t.querySelector(".fav").remove();
+  const fav = t.querySelector(".fav input") || { checked: false, addEventListener() {} };
+  fav.checked = !!previa.favorita;
+  t.classList.toggle("favorita", fav.checked);
+  fav.addEventListener("change", () => {
+    if (fav.checked) {
+      // Solo una favorita por animación
+      document.querySelectorAll(`.tarjeta[data-animacion="${CSS.escape(animacion)}"]`).forEach(o => {
+        if (o !== t) { o.querySelector(".fav input").checked = false; o.classList.remove("favorita"); }
+      });
+    }
+    t.classList.toggle("favorita", fav.checked);
+  });
+
+  const texto = t.querySelector("textarea");
+  texto.value = previa.comentario || "";
+  const estado = t.querySelector(".estado");
+  if (previa.fecha) { estado.textContent = "Guardado"; estado.className = "estado ok"; }
+  texto.addEventListener("input", () => { estado.textContent = "Sin guardar"; estado.className = "estado"; });
+
+  t.querySelector(".guardar button").addEventListener("click", async () => {
+    estado.textContent = "Guardando…"; estado.className = "estado";
+    const envios = [{ id: variante.id, voto, comentario: texto.value.trim(), favorita: fav.checked }];
+    // Si se marcó como favorita, desmarca las demás de esta animación en el servidor
+    if (fav.checked) {
+      document.querySelectorAll(`.tarjeta[data-animacion="${CSS.escape(animacion)}"]`).forEach(o => {
+        const op = opiniones[o.dataset.id];
+        if (o !== t && op && op.favorita) envios.push({ ...op, id: o.dataset.id, favorita: false });
+      });
+    }
+    try {
+      for (const datos of envios) {
+        const res = await fetch("/api/opiniones", {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(datos),
+        });
+        if (!res.ok) throw new Error(res.status);
+        opiniones[datos.id] = datos;
+      }
+      estado.textContent = "Guardado ✓"; estado.className = "estado ok";
+    } catch (e) {
+      estado.textContent = "No se pudo guardar. ¿Sigue abierto el servidor?"; estado.className = "estado error";
+    }
+  });
+  return t;
+}
+
+async function iniciar() {
+  const cont = document.getElementById("contenido");
+  try {
+    const [manifiesto, op] = await Promise.all([
+      fetch("manifest.json").then(r => r.json()),
+      fetch("/api/opiniones").then(r => r.json()).catch(() => ({})),
+    ]);
+    opiniones = op;
+    suave = !!manifiesto.suave;
+    fuente = manifiesto.escalaFuente || 1;
+    anchoRef = manifiesto.ancho || 0;
+    if (!suave) document.body.classList.add("pixelado");
+    const zooms = suave ? [[0.75, "75%"], [1, "100%"], [1.5, "150%"]] : [[4, "×4"], [6, "×6"], [8, "×8"]];
+    ajustes.zoom = suave ? 1 : 6;
+    const grupoZoom = document.getElementById("zooms");
+    for (const [valor, texto] of zooms) {
+      const b = document.createElement("button");
+      b.className = "chip"; b.dataset.zoom = valor; b.textContent = texto;
+      b.setAttribute("aria-pressed", String(valor === ajustes.zoom));
+      grupoZoom.appendChild(b);
+    }
+    enlazarChips("zoom", "zoom", Number);
+    cont.innerHTML = "";
+    for (const anim of manifiesto.animaciones) {
+      const sec = document.createElement("section");
+      sec.innerHTML = "<h2></h2><p></p><div class='tarjetas'></div>";
+      sec.querySelector("h2").textContent = anim.nombre;
+      sec.querySelector("p").textContent = anim.descripcion;
+      cont.appendChild(sec);
+      for (const v of anim.variantes) {
+        const tarjeta = crearTarjeta(v, anim.nombre, anim.multiple);
+        sec.querySelector(".tarjetas").appendChild(tarjeta);
+        const imgs = v.hoja
+          ? cortarHoja(await cargarImagen(v.hoja), v, manifiesto.tam * (v.escalaFuente || manifiesto.escalaFuente || 1))
+          : await Promise.all(v.fotogramas.map(cargarImagen));
+        reproductores.push(crearReproductor(v, imgs, manifiesto.tam, tarjeta));
+      }
+    }
+  } catch (e) {
+    cont.innerHTML = "<p class='estado error'>No se pudieron cargar las propuestas. Abre la página desde el servidor local.</p>";
+    console.error(e);
+  }
+  let antes = performance.now();
+  const bucle = ahora => {
+    const dt = ahora - antes; antes = ahora;
+    reproductores.forEach(r => r.avanzar(dt));
+    requestAnimationFrame(bucle);
+  };
+  requestAnimationFrame(bucle);
+}
+
+function enlazarChips(atributo, clave, convertir) {
+  const chips = document.querySelectorAll(`[data-${atributo}]`);
+  chips.forEach(c => c.addEventListener("click", () => {
+    ajustes[clave] = convertir(c.dataset[atributo]);
+    chips.forEach(o => o.setAttribute("aria-pressed", String(o === c)));
+    reproductores.forEach(r => { r.dibujarMiniaturas(); r.dibujar(); });
+  }));
+}
+enlazarChips("fondo", "fondo", String);
+enlazarChips("vel", "vel", Number);
+
+iniciar();
+</script>
+</body>
+</html>
